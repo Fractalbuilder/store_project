@@ -1,0 +1,2 @@
+Run the environment:
+source project5_env/bin/activate

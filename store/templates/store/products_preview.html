@@ -1,0 +1,24 @@
+{% block content %}
+    <div class="unspaced-form-row">
+        {% if products %}
+            {% for product in products %}
+                <div class="col-md-6 col-lg-6 bordered-section">
+                    <h3><b>{{ product.name }}</b></h3>
+
+                    {% if product.img_url == "" %}
+                        <img class="product-img img-fluid" src="https://1vyf1h2a37bmf88hy3i8ce9e-wpengine.netdna-ssl.com/wp-content/themes/public/img/noimgavailable.jpg" alt="">
+                    {% else %}
+                        <img class="product-img img-fluid" src="{{ product.img_url }}" alt="">
+                    {% endif%}
+                    
+                    <p><b>Price:</b> ${{ product.price }}</p>
+                    <p><b>Description:</b> {{ product.shortDescription }}</p>
+                    <br>
+                    <button class="common-button" onclick="location.href='/product/{{ product.id }}'">View</button>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No product matches the filter.</p>   
+        {% endif%}
+    </div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% block content %}
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center">
+        <p class="feature"><b>Brand:</b> {{ productFeature.brand }}</p>
+        <p class="feature"><b>Hardware interface:</b> {{ productFeature.hardwareInterface }}</p>
+        <p class="feature"><b>Portable:</b>
+            {% if productFeature.portable == "true" %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </p>
+        <p class="feature"><b>Storage (GB):</b> {{ productFeature.storage }}</p>
+    </div>
+{% endblock %}

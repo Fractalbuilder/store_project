@@ -1,0 +1,137 @@
+{% extends "store/layout.html" %}
+
+{% block title %}
+    {{ product.name }}
+{% endblock %}
+
+{% block body %}
+    <hr id="main-hr">
+    <div id="main-container">
+        {% include 'store/categories_path.html' %}
+        <br>
+        <h2 class="title">{{ product.name }}</h2>
+        <div class="form-row" style="position: relative;">
+            <div class="col-md-8 col-lg-8">
+                {% if product.img_url == "" %}
+                    <img id="product_img" src="https://1vyf1h2a37bmf88hy3i8ce9e-wpengine.netdna-ssl.com/wp-content/themes/public/img/noimgavailable.jpg" alt="">
+                {% else %}
+                    <img id="product_img" src="{{ product.img_url }}" class="img-fluid" style="max-height: 450px;" alt="">
+                {% endif %}
+            </div>
+            <div class="col-md-4 col-lg-4 spaced-tile" data-offset=6>
+                {% if user.is_authenticated %}
+                    <div id="updateQuantitySection" style="display: none">
+                        <h3 id="acceptedQuantity"></h3>
+                        {% include 'store/product_quantity.html' with product=product %}
+                    </div>
+                    
+                    <button class="common-button" id="addProductButton" style="display: none;" onclick="addProduct()">Add to cart</button>
+                    <p id="noItemsWarning" style="display: none;">No items in stock at the moment</p>
+                    <hr>
+                {% endif %}
+
+                {% include 'store/rating_manager.html' %}
+                <hr>
+                <p>{{ product.shortDescription }}</p>
+                <hr>
+                <div class="form-row">
+                    <p class="col-6"><b>Price:</b> ${{ product.price }}</p>
+                    <p class="col-6"><b>Stock:</b> {{ product.stock }}</p>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <h3 class="title">Features</h3>
+        <br>
+        {% include filter_manager %}
+        <br>
+        <div class="unspaced-form-row">
+            <div class="col-md-8 col-lg-8 bordered-section" style="font-size: 10pt; text-align: justify; text-justify: inter-word;">
+                <h3 class="title">Description</h3>
+                <br>
+                {{ productDescription | safe }}</div>
+            <div class="col-md-4 col-lg-4 bordered-section">
+                <h3 class="title">Comments</h3>
+                <br>
+		<div class="form-group2">
+                    <form action='add_comment/{{ product.id }}' method="post">
+                        {% csrf_token %}
+                        {{ commentForm.comment }}
+                        <br>
+
+                        {% if user.is_authenticated %}
+                        <input class="common-button vertically-spaced" type=submit value="Save">
+                        {% else %}
+                        <button class="common-button vertically-spaced" onclick="showWarning('commentInput', 'Please log in.', 'failure')" type="button">Save</button>
+                        <div><br></div>
+                        <p id="commentInput"></p>
+                        {% endif %}
+                    </form>
+                </div>
+
+                {% if comments %}
+                <hr>
+                {% endif %}
+                {% for comment in comments %}
+                    <p><b>{{ comment.user }}:</b> {{ comment.comment }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script>
+        function vertical_space () {
+            let spaceTiles = document.getElementsByClassName("spaced-tile");
+
+            for (var i=0; i<spaceTiles.length; i++) {
+                if (spaceTiles[i].offsetTop >= spaceTiles[i].dataset.offset) {
+                    spaceTiles[i].style["margin-top"] = "5px";
+                } else {
+                    spaceTiles[i].style["margin-top"] = "0px";
+                }
+            }
+        }
+
+        window.onresize = function (event) {
+            vertical_space();
+        }
+
+        window.addEventListener("load", function() {
+            if ("{{ user }}" != "AnonymousUser") {
+                if ("{{ cartDetail }}" != "None") {
+                    data = {"addedItems": "{{ cartDetail.quantity }}"};
+
+                    renderProductQuantity("{{ product.id }}", data);
+                } else {
+                    document.getElementById("updateQuantitySection").style.display = "none";
+
+                    if ("{{ product.stock }}" == 0) {
+                        document.getElementById("noItemsWarning").style.display = "block";
+                    } else {
+                        document.getElementById("addProductButton").style.display = "block";
+                    }
+                }
+            }
+
+            vertical_space();
+        }, false);
+
+        function addProduct () {
+            fetch('/cart/set_product_quantity/' + '{{ product.id }}/1')
+                .then(response => response.json())
+                .then(data => {
+                    renderProductQuantity("{{ product.id }}", data)
+                });
+        }
+
+        function renderProductQuantity (productId, data) {
+            document.getElementById("addProductButton").style.display = "none";           
+            document.getElementById("acceptedQuantity").innerHTML = data.addedItems + ' items added';
+            document.getElementById("quantity_" + productId).value = data.addedItems;
+            document.getElementById("updateQuantitySection").style.display = "block";
+        }
+    </script>
+{% endblock %}

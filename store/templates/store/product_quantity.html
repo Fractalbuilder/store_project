@@ -1,0 +1,50 @@
+{% block content %}
+    <div class="wrapped-container d-flex">
+        <div>
+            <input id="quantity_{{ product.id }}" type="text" name="quantity" maxlength="4" size="2" value="{{ cartDetail.quantity }}">
+        </div>
+        &nbsp;
+        <div class="spaced-tile" data-offset=34 style="position: relative;">
+            <button class="common-button" onclick="setProductQuantity('{{ product.id }}')">Modify</button>
+            <button class="common-button spaced-tile" data-offset=36 onclick="location.href='/cart/remove_product/{{ product.id }}'">Remove</button>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        function vertical_space () {
+            let spaceTiles = document.getElementsByClassName("spaced-tile");
+
+            for (var i=0; i<spaceTiles.length; i++) {
+                if (spaceTiles[i].offsetTop >= spaceTiles[i].dataset.offset) {
+                    spaceTiles[i].style["margin-top"] = "5px";
+                } else {
+                    spaceTiles[i].style["margin-top"] = "0px";
+                }
+            }
+        }
+
+        window.onresize = function (event) {
+            vertical_space();
+        }
+
+        window.addEventListener("load", function() {
+            vertical_space();
+        }, false);
+
+        function setProductQuantity (productId) {
+            productQuantityId = "quantity_" + productId;
+            wantedQuantity = document.getElementById(productQuantityId).value;
+
+            if(wantedQuantity == 0){
+                location.href="/cart/remove_product/{{ product.id }}"
+            } else {
+                fetch('/cart/set_product_quantity/' + productId + '/' + wantedQuantity)
+                    .then(response => response.json())
+                    .then(data => {
+                        renderProductQuantity(productId, data);
+                    });
+            }
+        }
+    </script>
+{% endblock %}

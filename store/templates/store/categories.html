@@ -1,0 +1,20 @@
+{% extends "store/layout.html" %}
+
+{% block body %}
+    <hr id="main-hr">
+    <div id="main-container">
+        {% include 'store/categories_path.html' %}
+        <br>
+        <h2 style="margin-bottom: 0px" class="title"><b>Subcategories</b></h2>
+        
+        <div style="display: flex; flex-direction: row; flex-wrap: wrap">
+            {% for category in childCategories %}
+                {% if category.leaf == "true" %}
+                    <a style="margin-right: 30px;" href="{% url 'category' category_id=category.id filtered='none' %}">{{ category.name }}</a>
+                {% else %}
+                    <a style="margin-right: 30px;" href="{% url 'categories' child_category_id=category.id %}">{{ category.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

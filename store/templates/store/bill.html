@@ -1,0 +1,127 @@
+{% extends "store/layout.html" %}
+{% load static %}
+
+{% block title %}
+    {{ product.name }}
+{% endblock %}
+
+{% block body %}
+    <hr id="main-hr">
+    <div id="main-container">
+        {% if cartDetails %}
+            <div id="products-container">
+                <h2 class="title"><b>Cart</b></h2>
+                <p class="d-block d-md-none">&nbsp;</p>
+                <div class="form-row-header d-none d-md-block">
+                    <div class="form-row">
+                        <div class="col-md-7 col-lg-7 d-flex align-items-center">
+                            <p><b>Name</b></p>
+                        </div>
+                        <div class="col-md-5 col-lg-5">
+                            <div class="form-row">
+                                <div class="col-md-6 col-lg-6">
+                                    <p><b>Quantity</b></p>
+                                </div>
+                                <div class="col-md-3 col-lg-3">
+                                    <p><b>Unit Price</b></p>
+                                </div>
+                                <div class="col-md-3 col-lg-3">
+                                    <p><b>Total Price</b></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% for cartDetail in cartDetails %}
+                    <div id="product_{{ cartDetail.product.id }}" class="unspaced-form-row bordered-section" style="position: relative;">
+                        <div class="col-md-7 col-lg-7 d-flex align-items-center">
+                            <a href="{% url 'product' cartDetail.product.id %}">{{ cartDetail.product.name }}</a>
+                        </div>
+                        <div class="col-md-5 col-lg-5 spaced-tile" data-offset=24>
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-6 col-lg-6">
+                                    {% include 'store/product_quantity.html' with product=cartDetail.product %}
+                                </div>
+                                <div class="col-sm-6 col-md-6 col-lg-6 d-flex align-items-center spaced-tile" data-offset=36>
+                                    <div style="width: 100%;">
+                                        <div class="form-row">
+                                            <div class="col-6 d-flex">
+                                                <p class="d-block d-md-none"><b>Unit:&nbsp;</b></p>
+                                                <p>${{ cartDetail.unitPrice|floatformat:2 }}</p>
+                                            </div>
+                                            <div class="col-6 d-flex">
+                                                <p class="d-block d-md-none"><b>Total:&nbsp;</b></p>
+                                                <p id="cartDetailTotalPrice_{{ cartDetail.product.id }}">${{ cartDetail.totalPrice|floatformat:2 }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <br>
+                <p id="cartTotalPrice"><b>Total:</b> ${{ cart.totalPrice|floatformat:2 }}</p>
+                <button class="common-button vertically-spaced" onclick="location.href='/bill/create'">Buy</button>
+                <hr class="form-row-separator">
+            </div>
+        {% endif %}
+        <div id="main-bills-container">
+            <h2 class="title"><b>Bills</b></h2>
+            <p class="d-block d-sm-none">&nbsp;</p>
+            <div id="bills-container" style="display: none;">
+                <div class="form-row-header d-none d-sm-block">
+                    <div class="form-row">
+                        <div class="col-sm-3 col-md-3 col-lg-3">
+                            <p><b>Id</b></p>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-6">
+                            <p><b>Creation date</b></p>
+                        </div>
+                        <div class="col-sm-3 col-md-3 col-lg-3">
+                            <p><b>Total</b></p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    {% for bill in bills %}
+                        <div id="bill_{{ bill.id }}" class="unspaced-form-row bordered-section">
+                            <div class="col-sm-3 d-flex">
+                                <p class="d-block d-sm-none"><b>Id:&nbsp;</b></p>
+                                <p>{{ bill.id }}</p>
+                            </div>
+                            <div class="col-sm-6 d-flex">
+                                <p class="d-block d-sm-none"><b>Creation date:&nbsp;</b></p>
+                                <p>{{ bill.creationDate }}</p>
+                            </div>
+                            <div class="col-sm-3 d-flex">
+                                <p class="d-block d-sm-none"><b>Total:&nbsp;</b></p>
+                                <p>${{ bill.totalPrice|floatformat:2 }}</p>
+                            </div>
+                        </div>  
+                    {% endfor %}
+                </div>
+            </div>
+            <p id="bills-warning" style="display: none;">No bills at the moment</p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script>
+        window.onload = function () {
+            if ("{{ billsExist }}" == 'yes') {
+                document.getElementById("bills-container").style = "display: block";
+            } else {
+                document.getElementById("bills-warning").style = "display: block";
+            }
+        }
+
+        function renderProductQuantity (productId, data) {
+            document.getElementById(productQuantityId).value = data.addedItems;
+            document.getElementById("cartDetailTotalPrice_" + productId).innerHTML = "$" + data.cartDetailTotalPrice.toFixed(2);
+            document.getElementById("cartTotalPrice").innerHTML = "Total: $" +  data.cartTotalPrice.toFixed(2);
+        }
+    </script>
+{% endblock %}

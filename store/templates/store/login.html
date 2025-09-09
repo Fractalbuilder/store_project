@@ -1,0 +1,24 @@
+{% extends "store/layout.html" %}
+
+{% block body %}
+    <div class="unspaced-form-row" style="justify-content: center">
+        <div class="col-sm-7 col-md-6 col-lg-5 bordered-background">
+            <h2>Login</h2>
+
+            <form action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input autofocus class="form-control" type="text" name="username" placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="password" name="password" placeholder="Password">
+                </div>
+                <input class="common-button" type="submit" value="Login">
+            </form>
+            <hr>
+            <div style="display: flex; justify-content: center">
+                Don't have an account?&nbsp;<a href="{% url 'register' %}">Register here.</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

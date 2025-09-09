@@ -1,0 +1,130 @@
+{% block content %}
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center">
+        <div style="display: flex; flex-direction: row; align-items: center">
+            <p>Brand</p>
+            &nbsp;
+            <select id="brand">
+                <option>All</option>
+                <option>Samsung</option>
+                <option>SanDisk</option>
+                <option>Western Digital</option>
+            </select>
+        </div>
+        <div style="display: flex; flex-direction: row; align-items: center">
+            <p>Price</p>
+            &nbsp;
+            <input id="price-min" type="text" name="quantity" maxlength="6" size="4" placeholder="min">
+            &nbsp;
+            <input id="price-max" type="text" name="quantity" maxlength="6" size="4" placeholder="max">
+        </div>
+        <div style="display: flex; flex-direction: row; align-items: center">
+            <p>Hardware interface</p>
+            &nbsp;
+            <select id="hardware-interface">
+                <option>All</option>
+                <option>PCI Express x4</option>
+                <option>SATA 6.0</option>
+                <option>USB 3.1 Type C</option>
+            </select>
+        </div>
+        <div style="display: flex; flex-direction: row; align-items: center">
+            <p>Portable</p>
+            &nbsp;
+            <select id="portable">
+                <option>All</option>
+                <option>Yes</option>
+                <option>No</option>
+            </select>
+        </div>
+        <div style="display: flex; flex-direction: row; align-items: center">
+            <p>Storage (GB)</p>
+            &nbsp;
+            <input id="storage-min" type="text" name="quantity" maxlength="4" size="2" placeholder="min">
+            &nbsp;
+            <input id="storage-max" type="text" name="quantity" maxlength="4" size="2" placeholder="max">
+        </div>
+        <button class="common-button" onclick="filter()">Filter</button>
+    </div>
+    <p id="filter-warning" class="warning"></p>
+{% endblock %}
+{% block script %}
+    <script>
+        brand = document.getElementById("brand");
+        priceMin = document.getElementById("price-min");
+        priceMax = document.getElementById("price-max");
+        hardwareInterface = document.getElementById("hardware-interface");
+        portable = document.getElementById("portable");
+        storageMin = document.getElementById("storage-min");
+        storageMax = document.getElementById("storage-max");
+
+        function filter () {
+            brandValue = brand.value;
+            priceMinValue = parseInt(priceMin.value, 10);
+            priceMaxValue = parseInt(priceMax.value, 10);
+            hardwareInterfaceValue = hardwareInterface.value;
+            portableValue = portable.value;
+            storageMinValue = parseInt(storageMin.value, 10);
+            storageMaxValue = parseInt(storageMax.value, 10);
+
+            if (!isNaN(priceMinValue) && !isNaN(priceMaxValue)) {
+                if (priceMinValue > priceMaxValue) {
+                    showWarning("filter-warning", "Wrong field", "error");
+                    return;
+                }
+            }
+
+            if (!isNaN(storageMinValue) && !isNaN(storageMaxValue)) {
+                if (storageMinValue > storageMaxValue) {
+                    showWarning("filter-warning", "Wrong field", "error");
+                    return;
+                }
+            }
+
+            let filtered = "";
+
+            if (brandValue != "All") {
+                filtered += "datastoragefeature__brand=" + "'" + brandValue + "'" + ","
+            }
+
+            if (!isNaN(priceMinValue)) {
+                filtered += "price__gte=" + priceMinValue + ","
+            }
+
+            if (!isNaN(priceMaxValue)) {
+                filtered += "price__lte=" + priceMaxValue + ","
+            }
+
+            if (hardwareInterfaceValue != "All") {
+                filtered += "datastoragefeature__hardwareInterface=" + "'" + hardwareInterfaceValue + "'" + ","
+            }
+
+            if (portableValue != "All") {
+                if (portableValue == "Yes") {
+                    filtered += "datastoragefeature__portable='true',"
+                } else {
+                    filtered += "datastoragefeature__portable='false',"
+                }
+            }
+
+            if (!isNaN(storageMinValue)) {
+                filtered += "datastoragefeature__storage__gte=" + storageMinValue + ","
+            }
+
+            if (!isNaN(storageMaxValue)) {
+                filtered += "datastoragefeature__storage__lte=" + storageMaxValue + ","
+            }
+
+            lastChar = filtered[filtered.length - 1];
+
+            if (lastChar == ",") {
+                filtered = filtered.slice(0, -1);
+            }
+
+            if (filtered == "") {
+                location.href="/category/" + "{{ category.id }}" + "/none";
+            } else {
+                location.href="/category/" + "{{ category.id }}" + "/" + filtered;
+            }
+        }
+    </script>
+{% endblock %}

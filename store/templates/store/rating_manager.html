@@ -1,0 +1,72 @@
+{% block content %}
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap">
+        <div onmouseout="StrokeOff()" style="font-size: 0;">
+            <svg onclick="setProductRating(1)" onmouseover="StrokeOn(0)" height="28.542999" width="30" xmlns="http://www.w3.org/2000/svg">
+                <path id="star-stroke-00" d="m0 10.90707h30.000515l-24.2676231 17.63593 9.2795121-28.543 9.279511 28.543z" fill="#025" stroke-width=".024292"/>
+                <path id="star-fill-00" d="m6.4408931 12.932519h17.1187289l-13.8474576 10.063318 5.2950236-16.2870498 5.295024 16.2870498z" fill="#fff" stroke-width=".013861"/>
+            </svg>
+            <svg onclick="setProductRating(2)" onmouseover="StrokeOn(1)" height="28.542999" width="30" xmlns="http://www.w3.org/2000/svg">
+                <path id="star-stroke-01" d="m0 10.90707h30.000515l-24.2676231 17.63593 9.2795121-28.543 9.279511 28.543z" fill="#025" stroke-width=".024292"/>
+                <path id="star-fill-01" d="m6.4408931 12.932519h17.1187289l-13.8474576 10.063318 5.2950236-16.2870498 5.295024 16.2870498z" fill="#fff" stroke-width=".013861"/>
+            </svg>
+            <svg onclick="setProductRating(3)" onmouseover="StrokeOn(2)" height="28.542999" width="30" xmlns="http://www.w3.org/2000/svg">
+                <path id="star-stroke-02" d="m0 10.90707h30.000515l-24.2676231 17.63593 9.2795121-28.543 9.279511 28.543z" fill="#025" stroke-width=".024292"/>
+                <path id="star-fill-02" d="m6.4408931 12.932519h17.1187289l-13.8474576 10.063318 5.2950236-16.2870498 5.295024 16.2870498z" fill="#fff" stroke-width=".013861"/>
+            </svg>
+            <svg onclick="setProductRating(4)" onmouseover="StrokeOn(3)" height="28.542999" width="30" xmlns="http://www.w3.org/2000/svg">
+                <path id="star-stroke-03" d="m0 10.90707h30.000515l-24.2676231 17.63593 9.2795121-28.543 9.279511 28.543z" fill="#025" stroke-width=".024292"/>
+                <path id="star-fill-03" d="m6.4408931 12.932519h17.1187289l-13.8474576 10.063318 5.2950236-16.2870498 5.295024 16.2870498z" fill="#fff" stroke-width=".013861"/>
+            </svg>
+            <svg onclick="setProductRating(5)" onmouseover="StrokeOn(4)" height="28.542999" width="30" xmlns="http://www.w3.org/2000/svg">
+                <path id="star-stroke-04" d="m0 10.90707h30.000515l-24.2676231 17.63593 9.2795121-28.543 9.279511 28.543z" fill="#025" stroke-width=".024292"/>
+                <path id="star-fill-04" d="m6.4408931 12.932519h17.1187289l-13.8474576 10.063318 5.2950236-16.2870498 5.295024 16.2870498z" fill="#fff" stroke-width=".013861"/>
+            </svg>
+        </div>
+        &nbsp;
+        <p id="rating-warning" class="warning"></p>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        window.addEventListener("load", function() {
+            SetFill(parseInt("{{ product.rating }}", 10));
+        });
+
+        function StrokeOn(id) {
+            for (let i = 0; i < id + 1; i++) {
+                document.getElementById('star-stroke-0' + i).style.fill = "gold";
+            }
+        }
+
+        function StrokeOff() {
+            for (let i = 0; i < 5; i++) {
+                document.getElementById('star-stroke-0' + i).style.fill = "#002255";
+            }
+        }
+
+        function SetFill(rating) {
+            for (let i = 0; i < 5; i++) {
+                document.getElementById('star-fill-0' + i).style.fill = "white";
+            }
+
+            for (let i = 0; i < rating; i++) {
+                document.getElementById('star-fill-0' + i).style.fill = "#ffff00";
+            }
+        }
+
+        function setProductRating (rating) {
+            if ("{{ bought }}" == "True") {
+                fetch('/product/set_product_rating/' + '{{ product.id }}/' + rating)
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.message == "Updated") {
+                            SetFill(data.rating);
+                            showWarning("rating-warning", data.message, "success");
+                        }
+                    });
+            } else {
+                showWarning("rating-warning", "You haven't bought this product yet", "error");
+            }
+        }
+    </script>
+{% endblock %}

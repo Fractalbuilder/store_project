@@ -1,0 +1,29 @@
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Virtualenv
+venv/
+.env/
+*.env
+project5_env/
+
+# Django
+*.sqlite3
+db.sqlite3
+/media/
+staticfiles/
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
