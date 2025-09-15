@@ -27,3 +27,5 @@ staticfiles/
 .coverage
 .pytest_cache/
 htmlcov/
+
+important.txt
