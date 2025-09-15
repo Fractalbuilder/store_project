@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.shortcuts import redirect
 from django.core.paginator import Paginator
+from .controllers.auth_controller import register
 
 from . import util
 import markdown2, math
@@ -221,31 +222,6 @@ def productQuantity(product, user): #Delete me
     else:
         return 0
 
-def register(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        email = request.POST["email"]
-
-        # Ensure password matches confirmation
-        password = request.POST["password"]
-        confirmation = request.POST["confirmation"]
-        if password != confirmation:
-            return render(request, "store/register.html", {
-                "message": "Passwords must match."
-            })
-
-        # Attempt to create new user
-        try:
-            user = User.objects.create_user(username, email, password)
-            user.save()
-        except IntegrityError:
-            return render(request, "store/register.html", {
-                "message": "Username already taken."
-            })
-        login(request, user)
-        return HttpResponseRedirect(reverse("index"))
-    else:
-        return render(request, "store/register.html")
 
 def removeProduct(request, product_id):
     product = Product.objects.get(id=product_id)
